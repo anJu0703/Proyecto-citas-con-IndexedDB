@@ -195,7 +195,6 @@ class UI {
    }
 }
 
-
 const administrarCitas = new Citas();
 console.log(administrarCitas);
 const ui = new UI(administrarCitas);
@@ -286,10 +285,21 @@ function reiniciarObjeto() {
 
 
 function eliminarCita(id) {
-    administrarCitas.eliminarCita(id);
 
-    ui.imprimirCitas()
-}
+    const transaction = DB.transaction(['citas'],'readwrite');
+    const objectStore = transaction.objectStore('citas');
+
+    objectStore.delete(id);
+
+    transaction.oncomplete = ()=>{
+        console.log(`Cita ${id} eliminado`);
+        ui.imprimirCitas()
+    };
+   
+    transaction.onerror = ()=>{
+        console.log('Hubo un error');
+    };
+};
 
 function cargarEdicion(cita) {
 
